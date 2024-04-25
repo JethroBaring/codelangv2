@@ -1,0 +1,68 @@
+Context Free Grammars for CODE Programming Language
+
+* = zero or more
++ = atleast once
+? = optional
+| = or
+
+program -> import* funcDeclaration* "BEGIN" "CODE" varDeclaration* statement* "END" "CODE" EOF
+import -> "IMPORT" ("["  "]")
+funcDeclaration -> "FN" function
+function -> IDENTIFIER "(" parameters? ")"
+parameters -> type IDENTIFIER ( "," type IDENTIFIER )*
+
+type identifier = expression, identifier,
+
+varDeclaration -> "IMMUT"? type IDENTIFIER ( "=" expression)? (( "," IDENTIFIER )* ( "=" expression)?)*
+
+type -> "STRING" | "INT" | "CHAR" | "BOOL" | "FLOAT"
+statement -> exprStmt | printStmt | block | ifStmt | whileStmt | scanStmt | returnStmt
+ifStmt -> "IF" "(" expression ")" 
+          "BEGIN" "IF" 
+           statements* 
+          "END" "IF"
+          ("ELSE IF" "(" expression ")" 
+          "BEGIN" "IF" 
+           statements* 
+          "END" "IF")*
+          ("ELSE"
+          "BEGIN" "IF" 
+           statements* 
+          "END" "IF"
+          )?
+whileStmt -> "WHILE" "(" expression ")" 
+             "BEGIN" "WHILE" 
+              statements* 
+             "END" "WHILE"
+
+returnStmt -> "RETURN" expression?
+
+block -> ( "IF" | "ELSE" | "WHILE" ) "(" expression ")" blockContent
+blockContent -> "BEGIN" ( "IF" | "WHILE" ) statement* "END" ( "IF" | "WHILE" )
+exprStmt -> expression
+printStmt -> "print" expression
+scanStmt -> IDENTIFIER ( "," IDENTIFIER)*
+
+expression -> literal | unary | binary | grouping
+literal -> STRING_LITERAL | FLOAT_LITERAL | CHAR_LITERAL | TRUE_LITERAL | FALSE_LITERAL
+grouping -> '(' expression ')'
+unary ->  ( '-' | "NOT" | '+' ) call
+call -> primary ( "(" arguments* ")" )
+arguments -> expression ( "," expression )*
+
+
+binary -> expression operator expression
+operator -> '==' | '!=' | '<' | '>' | '<=' | '>=' | '+' | '-' | '*' | '/'
+
+expression -> assignment
+assignment -> IDENTIFIER "=" assignment | logic_or
+logic_or -> logic_and ( "OR" logic_and )*
+logic_and -> equality ( "AND" equality)*
+
+primary -> literal | "null" | "(" expression ")" | IDENTIFIER
+unary -> ( "!" | "-" ) | primary
+factor -> unary ( ( "/" | "*" ) unary )*
+equality -> comparison ( ( "!=" | "==" ) comparison )*
+comparison -> term ( ( ">" | ">=" | "<" | "<=" ) term )*
+term -> factor ( ( "-" | "+" ) factor )*
+
